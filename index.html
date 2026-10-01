@@ -119,12 +119,29 @@
   .ex-icon-tile {
     flex: none; width: 56px; height: 56px; border-radius: 10px; background: var(--surface-2);
     border: 1px solid var(--border); display: grid; place-items: center; margin-top: 1px;
-    overflow: hidden;
+    overflow: hidden; padding: 0; font: inherit;
   }
+  button.ex-icon-tile { appearance: none; cursor: pointer; }
+  button.ex-icon-tile:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
   .ex-icon-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .ex-icon { width: 30px; height: 30px; overflow: visible; }
   .icon-equip { color: var(--fg-muted); }
   .icon-move { color: var(--accent-2); }
+
+  .lightbox {
+    position: fixed; inset: 0; z-index: 50; background: rgba(8, 9, 10, 0.86);
+    display: flex; align-items: center; justify-content: center;
+    padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+  }
+  .lightbox-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 100%; max-height: 100%; }
+  .lightbox-figure img { max-width: min(92vw, 640px); max-height: 70vh; width: auto; height: auto; border-radius: 12px; display: block; background: var(--surface); }
+  .lightbox-figure figcaption { color: #fff; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.03em; font-size: 0.85rem; text-align: center; max-width: 80vw; }
+  .lightbox-close {
+    position: absolute; top: calc(env(safe-area-inset-top, 0px) + 14px); right: 16px;
+    width: 38px; height: 38px; border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.15);
+    color: #fff; font-size: 1.4rem; line-height: 1; cursor: pointer; display: grid; place-items: center; padding: 0;
+  }
+  .lightbox-close:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 
   .card-body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 4px; }
   .ex-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
@@ -273,6 +290,14 @@
   </section>
 </div>
 
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Fechar">&times;</button>
+  <figure class="lightbox-figure">
+    <img id="lightboxImg" src="" alt="">
+    <figcaption id="lightboxCaption"></figcaption>
+  </figure>
+</div>
+
 <script>
 (function () {
   "use strict";
@@ -363,6 +388,35 @@
   var activeDay = readJSON(STORE_PREFIX + "active", "a");
   if (!DIAS.some(function (d) { return d.id === activeDay; })) activeDay = "a";
   var repsOverrides = readJSON(STORE_PREFIX + "reps", {});
+
+  // ---- Lightbox (tap a photo to enlarge) ----
+  var lightbox = document.getElementById("lightbox");
+  var lightboxImg = document.getElementById("lightboxImg");
+  var lightboxCaption = document.getElementById("lightboxCaption");
+  var lightboxClose = document.getElementById("lightboxClose");
+  var lastFocused = null;
+
+  function openLightbox(src, caption, triggerEl) {
+    lastFocused = triggerEl || null;
+    lightboxImg.src = src;
+    lightboxImg.alt = caption;
+    lightboxCaption.textContent = caption;
+    lightbox.hidden = false;
+    lightboxClose.focus();
+  }
+  function closeLightbox() {
+    lightbox.hidden = true;
+    lightboxImg.src = "";
+    if (lastFocused) lastFocused.focus();
+  }
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
+  });
+
 
   function renderTabs() {
     tabsEl.innerHTML = "";
@@ -462,9 +516,18 @@
         renderPanel();
       });
 
-      var iconTile = document.createElement("label");
+      var iconTile;
+      if (ex.img) {
+        iconTile = document.createElement("button");
+        iconTile.type = "button";
+        iconTile.setAttribute("aria-label", "Ampliar foto de " + ex.nome);
+        iconTile.addEventListener("click", function () {
+          openLightbox(ex.img, ex.nome, iconTile);
+        });
+      } else {
+        iconTile = document.createElement("div");
+      }
       iconTile.className = "ex-icon-tile";
-      iconTile.setAttribute("for", check.id);
       iconTile.innerHTML = iconMarkup(ex);
 
       var body = document.createElement("div");
