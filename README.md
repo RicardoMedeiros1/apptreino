@@ -1,21 +1,22 @@
 # App Treino
 
-Checklist interativo dos treinos A, B e C (academia), em uma única página HTML — sem backend, sem instalação.
+Checklists interativos de treino — sem backend, sem instalação, abre direto no navegador do celular.
 
-## O que tem
+## Páginas
 
-- Abas para alternar entre Treino A (peito/ombro/tríceps), B (costas/trapézio/bíceps) e C (perna)
-- Cada exercício com foto, grupo muscular, séries × repetições (editável) e descrição de execução
-- Checklist de progresso por treino, salvo no navegador
-- Cronômetro de descanso entre séries (60s/90s/120s)
+- **`index.html` — Treino ABC**: 3 treinos (A peito/ombro/tríceps, B costas/trapézio/bíceps, C perna), com foto, grupo muscular, séries × repetições editável e checklist de progresso.
+- **`retomada.html` — Treino Retomada**: plano de 3 dias para quem está voltando a treinar (2 dias de inferiores + 1 de superiores), com observações de carga/progressão, tempo de descanso por exercício e checklist de progresso.
+
+Ambas têm cronômetro de descanso entre séries e fotos/ícones clicáveis (abrem ampliados em pop-up).
 
 ## Como usar
 
-Abra o `index.html` direto no navegador do celular (dá pra adicionar à tela inicial) ou publique com o GitHub Pages:
+Abra a página direto no navegador do celular (dá pra adicionar à tela inicial) ou publique com o GitHub Pages:
 
 1. Settings → Pages → Branch: `main` → pasta `/ (root)`
-2. O app fica disponível em `https://ricardomedeiros1.github.io/apptreino/`
+2. Treino ABC fica em `https://ricardomedeiros1.github.io/apptreino/`
+3. Treino Retomada fica em `https://ricardomedeiros1.github.io/apptreino/retomada.html`
 
 ## Editar os treinos
 
-Os exercícios de cada dia estão no array `DIAS`, dentro da tag `<script>` do `index.html`.
+Os exercícios de cada dia estão no array `DIAS`, dentro da tag `<script>` de cada arquivo HTML.
